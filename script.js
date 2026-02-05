@@ -83,3 +83,55 @@ window.addEventListener('scroll', () => {
 
 // Обновляем иконки
 lucide.createIcons();
+// Анимация счетчиков
+const animateCounters = () => {
+    const counters = document.querySelectorAll('.stat-card__value');
+    
+    const counterObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const target = +entry.target.getAttribute('data-target');
+                const updateCounter = () => {
+                    const count = +entry.target.innerText.replace(/[^0-9]/g, '');
+                    const increment = target / 50;
+
+                    if (count < target) {
+                        entry.target.innerText = Math.ceil(count + increment) + (target === 24 ? '/7' : target === 2 ? ' мин' : '%');
+                        setTimeout(updateCounter, 30);
+                    } else {
+                        entry.target.innerText = target + (target === 24 ? '/7' : target === 2 ? ' мин' : '%');
+                    }
+                };
+                updateCounter();
+                counterObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.5 });
+
+    counters.forEach(counter => counterObserver.observe(counter));
+};
+
+animateCounters();
+lucide.createIcons();
+// FAQ Accordion Logic
+const faqItems = document.querySelectorAll('.faq__question');
+
+faqItems.forEach(item => {
+    item.addEventListener('click', () => {
+        const isOpen = item.classList.contains('active');
+        
+        // Закрываем все открытые вопросы (опционально)
+        faqItems.forEach(el => {
+            el.classList.remove('active');
+            el.nextElementSibling.style.maxHeight = null;
+        });
+
+        if (!isOpen) {
+            item.classList.add('active');
+            const answer = item.nextElementSibling;
+            answer.style.maxHeight = answer.scrollHeight + "px";
+        }
+    });
+});
+
+lucide.createIcons();
